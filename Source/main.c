@@ -8,29 +8,31 @@
 
 #include "main.h"
 
-static uint16_t DARKNESS = 800;  //controls the level of darkness to trigger on
-static uint16_t DELAY = 1000;  //controls the rate of the flicker,  the bigger the number the slower the change
+static uint16_t DARKNESS = 800; 	//controls the level of darkness to trigger on
+static uint16_t DELAY = 1000;  		//controls the rate of the flicker,  the bigger the number the slower the change
 
-static uint16_t cycles;    //counts iterations of the clock interrupt
-static uint16_t wait;      //duration between changes in intensity
-static uint8_t wdtTime; //1 if device should be sleeping
+static uint16_t cycles;   //counts iterations of the clock interrupt
+static uint16_t wait;     //duration between changes in intensity
+static uint8_t wdtTime; 	//1 if device should be sleeping
 static uint8_t pulseTime; //1 if device should be flickering the LEDs
 
+//As it says, the main program
 int main()
 {
-	setup(); //intialize chip registers
+	setup(); 		//intialize chip registers
 
 	startDog(); //Put device into deep sleep and set the wake cycle
 
-	while(1) //functional loop for whenever the  device wakes
+	while(1) 		//functional loop for whenever the  device wakes
 	{
-		if (wdtTime) wdt(); //Should the device be sleeping? If so, check.
+		if (wdtTime) wdt(); 		//Should the device be sleeping? If so, check.
 		if (pulseTime) pulse(); //Should the device be flickering? Then flicker!
-		sleep_mode(); //sleep until the timer overflows or the WDT kicks off
+		sleep_mode(); 					//sleep until the timer overflows or the WDT kicks off
 	}
 	return 0;
 }
 
+//Fucntions defined
 void wdt() //if the it is dark out turn the WDT off and start the flicker cycle otherwise go back to sleep
 {
 					if (readADC() >= DARKNESS)
@@ -48,23 +50,23 @@ void wdt() //if the it is dark out turn the WDT off and start the flicker cycle 
 
 void pulse()
 {
-			if (cycles < wait)   // are we still waiting? continue to wait
+			if (cycles < wait)   				// are we still waiting? continue to wait
 			{
 				cycles++;
 			}
-			else                 //not waiting, let's do our stuff!
+			else                 				//not waiting, let's do our stuff!
 			{
 				if (readADC() < DARKNESS) //if it got light out, go to sleep
 				{
 					startDog();
 					timerStop();
 				}
-				else //Not waiting, not light out, well then let us flicker this candle!
+				else 											//Not waiting, not light out, well then let us flicker this candle!
 				{
-					wait = (random()%DELAY);  //determine new period to wait between changes
-					cycles = 0;              //need to start counting at 0 again for our wait duration
-					OCR0A = (random()%128+128);  //Set the Yellow LED intensity
-					OCR0B = (random()%128+128);  //Set the Red LED intesity
+					wait = (random()%DELAY);  	//determine new period to wait between changes
+					cycles = 0;              		//need to start counting at 0 again for our wait duration
+					OCR0A = (random()%128+128); //Set the Yellow LED intensity
+					OCR0B = (random()%128+128); //Set the Red LED intesity
 				}
 			}
 }
@@ -149,4 +151,3 @@ uint16_t readADC() // This functoin reads the phototransistor through the analog
 	sum = (sum/8); //Average the value from the 8x oversample
 	return sum; //return the attained value
 }
-

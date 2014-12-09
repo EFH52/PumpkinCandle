@@ -25,5 +25,4 @@ void pulse();
 void wdt();
 uint16_t readADC();
 
-
 #endif /* MAIN_H_ */
